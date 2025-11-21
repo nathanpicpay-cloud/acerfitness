@@ -1,8 +1,8 @@
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 import { UserProfile, WeeklyWorkoutPlan, DietPlan, Exercise } from "../types";
 
-// Initialize the client
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const apiKey = process.env.API_KEY;
+const ai = new GoogleGenAI({ apiKey });
 
 const MODEL_NAME = "gemini-2.5-flash";
 
@@ -12,6 +12,11 @@ const cleanText = (text: string): string => {
 };
 
 export const generateWeeklyWorkout = async (profile: UserProfile): Promise<WeeklyWorkoutPlan | null> => {
+  if (!apiKey) {
+    console.error("API Key not found. Please set API_KEY in environment.");
+    return null;
+  }
+
   const prompt = `
     Atue como um treinador de elite do Acer Fitness PRO.
     Crie uma divisão de treino completa (Split) baseada nestes dados:
@@ -70,6 +75,8 @@ export const generateWeeklyWorkout = async (profile: UserProfile): Promise<Weekl
 };
 
 export const swapExercise = async (currentExercise: Exercise, userGoal: string): Promise<Exercise | null> => {
+  if (!apiKey) return null;
+
   const prompt = `
     O usuário precisa substituir o exercício "${currentExercise.name}" (Grupo: ${currentExercise.muscleGroup}).
     Objetivo do usuário: ${userGoal}.
@@ -105,6 +112,8 @@ export const swapExercise = async (currentExercise: Exercise, userGoal: string):
 };
 
 export const generateDiet = async (profile: UserProfile, budget: number, period: 'Diário' | 'Semanal' | 'Mensal'): Promise<DietPlan | null> => {
+  if (!apiKey) return null;
+
   const prompt = `
     Crie um plano alimentar econômico para um orçamento de R$ ${budget} (${period}).
     Perfil: ${profile.weight}kg, Objetivo: ${profile.goal}.
@@ -144,6 +153,8 @@ export const generateDiet = async (profile: UserProfile, budget: number, period:
 };
 
 export const generateAffiliateCopy = async (type: 'whatsapp' | 'instagram' | 'email'): Promise<string> => {
+  if (!apiKey) return "Erro: API Key não configurada.";
+
   const prompt = `
     Escreva um texto de marketing (Copy) persuasivo para vender o "Acer Fitness PRO".
     Canal: ${type}.
@@ -170,6 +181,8 @@ export const generateAffiliateCopy = async (type: 'whatsapp' | 'instagram' | 'em
 };
 
 export const chatWithTrainer = async (message: string, context: string): Promise<string> => {
+  if (!apiKey) return "Erro: Conexão com a IA não configurada (Verifique API_KEY).";
+
   const prompt = `
     Você é o Personal Trainer IA do Acer Fitness PRO.
     Contexto do usuário: ${context}.
